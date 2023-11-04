@@ -2,8 +2,15 @@
 <html>
     <head>
         <title>AutoTA</title>
+
+        <!-- In your HTML, within the <head> or <body> tag -->
+<script type="text/javascript">
+    var csrf_token = '{{ csrf_token }}';
+</script>
+
     </head>
     <body>
+        <!--
         <div id="chat">
             <div id="chat-messages"></div>
             <form id="chat-form" method="post">
@@ -12,12 +19,64 @@
             </form>
           </div>
 
+
+
+
     <div id="chatbox">
-        <button type ="button"> Enter your prompt here
+        <button type ="button"> Enter your prompt here</button>
+    -->
+        <input type="text" id="messageInput" placeholder="Type your message here">
+        <button onclick="sendMessage()">Send</button>
+        <div id="response"></div>
 
-
-        </button>
-
-    </div>
     </body>
+
+    <script>
+
+        async function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value;
+        const requestOptions = {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        // Include CSRF token if necessary
+        'X-CSRFToken': csrf_token,
+        },
+        body: JSON.stringify({ message: message })
+  };
+
+  try {
+    const response = await fetch('', requestOptions);
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    const data = await response.json();
+    const responseDiv = document.getElementById('response');
+    displayMessage(message,data.response)
+    responseDiv.innerText = data.response;  // Display response message in the div
+  } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+  }
+}
+
+function displayMessage(message, response) {
+  const responseDiv = document.getElementById('response');
+
+  const messageDiv = document.createElement('div');
+  messageDiv.innerText = 'You: ' + message;
+  responseDiv.appendChild(messageDiv);
+
+  const responseMessageDiv = document.createElement('div');
+  responseMessageDiv.innerText = 'Bot: ' + response;
+  responseDiv.appendChild(responseMessageDiv);
+}
+
+
+
+
+
+
+
+    </script>
 </html>
