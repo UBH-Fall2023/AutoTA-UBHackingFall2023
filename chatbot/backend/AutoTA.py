@@ -92,10 +92,10 @@ class AutoTA():
             
             Remember that we are trying to help the student as a good teaching assistant would without giving them the answer to their question. Instead ask questions and lead them to information that will help them answer their own question. If you answered the users question, please regenerate your response to instead lead them to answer the question on their own."""
         
+        self.previous_messages = []
+        
     def get_filepaths_of_relevent_docs(self, user_input: str, percentage_of_similarity_represented=0.10):
         filepaths_of_relevent_docs = self.text_preprocessor.get_filepaths_of_relevent_docs(user_input, percentage_of_similarity_represented)
-        # Select just the first document for now
-        filepaths_of_relevent_docs = filepaths_of_relevent_docs[:1]
         return filepaths_of_relevent_docs
 
     # Define a function to generate the answer to the user's question
