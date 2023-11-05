@@ -132,6 +132,7 @@
         async function sendMessage() {
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value;
+            messageInput.value = "";
 
             // If message is longer than 150 characters, don't send it
             const max_token_number = 10;
@@ -171,7 +172,6 @@
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
-                messageInput.value = " ";
                 const backend_data_packet = await response.json();
 
                 lives = lives - 1;
