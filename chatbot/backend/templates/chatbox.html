@@ -1,156 +1,114 @@
-
 <html>
-    <head>
-        <title>AutoTA</title>
-
-
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-
-
-
-        <!-- In your HTML, within the <head> or <body> tag -->
-<script type="text/javascript">
-    var csrf_token = '{{ csrf_token }}';
-</script>
-
-    </head>
-    <body>
-        <!--
-        <div id="chat">
-            <div id="chat-messages"></div>
-            <form id="chat-form" method="post">
-              <input type="text" name="message" placeholder="Ask a question" maxlength="500">
-              <button type="submit">Send</button>
-            </form>
-          </div>
-
-
-
-
-    <div id="chatbox">
-        <button type ="button"> Enter your prompt here</button>
-    -->
-        <div class="container mt-5">
-        <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
-        <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
-        <div id="response" class="mt-4"></div>
-        <button id="modeButton" onclick="toggleMode()"> toggle mode</button>
-        <script>
-          let isDarkMode = false;
- 
-          function toggleMode() {
-            let element = document.body;
-            var content = document.getElementById("DarkModetext");
-   
-            isDarkMode = !isDarkMode;
-   
-            element.className = isDarkMode ? "dark-mode" : "light-mode";
-            button.innerText = isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
-          }
+   <head>
+      <title>AutoTA</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+      <!-- In your HTML, within the <head> or <body> tag -->
+      <script type="text/javascript">
+         var csrf_token = '{{ csrf_token }}';
       </script>
-    </div>
-    <div class="sidebar">
-      <a href="#">Link 1</a>
-      <a href="#">Link 2</a>
-      <a href="#">Link 3</a>
-    </div>
+   </head>
+   <body>
+      <div class="container mt-5">
+         <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
+         <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
+         <div id="response" class="mt-4"></div>
+         <button id="modeButton" onclick="toggleMode()">Toggle Mode</button>
+         <script>
+            let isDarkMode = false;
+            
+            function toggleMode() {
+               let element = document.body;
+               var content = document.getElementById("DarkModetext");
+               isDarkMode = !isDarkMode;
+               element.className = isDarkMode ? "dark-mode" : "light-mode";
+               button.innerText = isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
+            }
+         </script>
+      </div>
+      <div class="sidebar">
+         <a href="#">Link 1</a>
+         <a href="#">Link 2</a>
+         <a href="#">Link 3</a>
+      </div>
+      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+      <style>
+         #response {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 550px;
+            overflow-y: scroll;
+         }
+         .dark-mode {
+            background-color: #333333;
+            color: #fff;
+         }
+         .light-mode {
+            background-color: white;
+            color: black;
+         }
+         #response div {
+            margin-bottom: 10px;
+         }
+         .sidebar {
+            width: 175px;
+            background-color: #f1f1f1;
+            position: absolute;
+            top: 150;
+            right: 40;
+            height: 200px;
+         }
+         .sidebar a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #000;
+         }
+      </style>
+   </body>
+   <script>
+      async function sendMessage() {
+         const messageInput = document.getElementById('messageInput');
+         const message = messageInput.value;
+         const requestOptions = {
+            method: 'POST',
+            headers: {
+               'Content-Type': 'application/json',
+               // Include CSRF token if necessary
+               'X-CSRFToken': csrf_token,
+            },
+            body: JSON.stringify({ message: message })
+         };
 
-
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-        <style>
-      #response {
-          border: 1px solid #ccc;
-          padding: 10px;
-          height: 550px;
-          overflow-y: scroll;
+         try {
+            const response = await fetch('', requestOptions);
+            if (!response.ok) {
+               throw new Error('Network response was not ok ' + response.statusText);
+            }
+            const data = await response.json();
+            const responseDiv = document.getElementById('response');
+            displayMessage(message, data.response)
+            responseDiv.innerText = data.response;  // Display response message in the div
+         } catch (error) {
+            console.error('There has been a problem with your fetch operation:', error);
+         }
       }
-      .dark-mode {
-        background-color: #333333; 
-        color: #fff;
+
+      function displayMessage(message, response) {
+         const responseDiv = document.getElementById('response');
+
+         const messageDiv = document.createElement('div');
+         messageDiv.innerText = 'You: ' + message;
+         responseDiv.appendChild(messageDiv);
+
+         const responseMessageDiv = document.createElement('div');
+         responseMessageDiv.innerText = 'Bot: ' + response;
+         responseDiv.appendChild(responseMessageDiv);
+
+         chatbox.scrollTop = chatbox.scrollHeight;
       }
-
-      .light-mode {
-          background-color: white;
-          color: black;
-      }
-      #response div {
-          margin-bottom: 10px;
-      }
-      .sidebar {
-        width: 175px;
-        background-color: #f1f1f1;
-        position: absolute;
-        top: 150;
-        right: 50;
-        height: 200px;
-      }
-      .sidebar a {
-        display: block;
-        padding: 10px;
-        text-decoration: none;
-        color: #000;
-      }
-
-        
-    </style>
-    </body>
-
-    <script>
-
-        async function sendMessage() {
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value;
-        const requestOptions = {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        // Include CSRF token if necessary
-        'X-CSRFToken': csrf_token,
-        },
-        body: JSON.stringify({ message: message })
-  };
-
-  try {
-    const response = await fetch('', requestOptions);
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    const data = await response.json();
-    const responseDiv = document.getElementById('response');
-    displayMessage(message,data.response)
-    responseDiv.innerText = data.response;  // Display response message in the div
-  } catch (error) {
-    console.error('There has been a problem with your fetch operation:', error);
-  }
-}
-
-
-function displayMessage(message, response) {
-  const responseDiv = document.getElementById('response');
-
-  const messageDiv = document.createElement('div');
-  messageDiv.innerText = 'You: ' + message;
-  responseDiv.appendChild(messageDiv);
-
-  const responseMessageDiv = document.createElement('div');
-  responseMessageDiv.innerText = 'Bot: ' + response;
-  responseDiv.appendChild(responseMessageDiv);
-
-  chatbox.scrollTop = chatbox.scrollHeight;
-
-}
-
-
-
-
-
-
-
-    </script>
+   </script>
 </html>
