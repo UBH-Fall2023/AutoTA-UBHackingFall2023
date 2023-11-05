@@ -97,6 +97,8 @@
         <div class="chat-footer">
             <input type="text" id="messageInput" class="form-control" placeholder="Type your message here" onkeydown="checkEnter(event)">
             <button id="send" onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
+            // Add a button to referesh the page
+            <button id="refresh" onclick="location.reload()" class="btn btn-primary mt-2">Refresh</button>
         </div>
     </div>
 
@@ -135,7 +137,7 @@
             messageInput.value = "";
 
             // If message is longer than 150 characters, don't send it
-            const max_token_number = 10;
+            const max_token_number = 150;
             token_number = message.split(" ").length;
             if((token_number < 2)){
                 alert("Please enter more context!");

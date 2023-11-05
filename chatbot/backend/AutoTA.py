@@ -96,6 +96,7 @@ class AutoTA():
         
     def get_filepaths_of_relevent_docs(self, user_input: str, percentage_of_similarity_represented=0.10):
         filepaths_of_relevent_docs = self.text_preprocessor.get_filepaths_of_relevent_docs(user_input, percentage_of_similarity_represented)
+        filepaths_of_relevent_docs = filepaths_of_relevent_docs[0] # Keep only the most relevent doc for now
         return filepaths_of_relevent_docs
 
     # Define a function to generate the answer to the user's question
