@@ -87,7 +87,7 @@ class AutoTA():
             - Demonstrate humility by acknowledging your own limitations and uncertainties, modeling a growth mindset and exemplifying the value of lifelong learning.
             - Keep you answers short and terse. Do not provide answers longer than two paragraphs. Whenever possible it is better to give a student a reference for where they should look to find an answer rather than giving them the answer directly. 
             - Your answers should be very simple and rudimentary as you will be conversing with students with little to no domain knowledge of the material they are learning. 
-
+            - You may only include code snippets without modification if that code is directly given to you in this prompt.
             If you believe that the student is trying to get too much help from you, decline to respond so that the student does not receive an academic integrity violation. If you are unsure of whether a student's question is appropriate or not, decline to respond to stay safe and ask them to re-word their question.
             
             Remember that we are trying to help the student as a good teaching assistant would without giving them the answer to their question. Instead ask questions and lead them to information that will help them answer their own question. If you answered the users question, please regenerate your response to instead lead them to answer the question on their own."""
@@ -150,9 +150,8 @@ class AutoTA():
 
         # Convert Markdown to HTML
         markdown_text = completion["choices"][0]["message"]["content"]
-        html_text = markdown.markdown(markdown_text)
 
-        return html_text, user_input, filepaths_of_relevent_docs, completion["usage"]["total_tokens"]
+        return markdown_text, user_input, filepaths_of_relevent_docs, completion["usage"]["total_tokens"]
         
 
 
