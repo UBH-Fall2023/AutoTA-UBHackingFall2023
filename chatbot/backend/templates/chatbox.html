@@ -23,10 +23,11 @@
         #response {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 70%;
+            height: 60%;
             overflow-y: scroll;
             margin-bottom: 10px; /* Added margin for spacing */
-            margin-right: 100px; /* Added margin for spacing */
+            padding-right: 40px;
+            border-radius: 10px;
         }
         .dark-mode {
             background-color: #333333;
@@ -43,7 +44,7 @@
             width: 200px; /* Adjusted width */
             background-color: #f1f1f1;
             position: fixed;
-            top: 150px;
+            top: 200px;
             right: 20px;
             height: auto;
             border: 1px solid #ccc;
@@ -84,27 +85,34 @@
     </style>
 </head>
 <body>
-    <h1 id="lives-text">You have 5 questions remaining!</h1>
+    <h1 style="text-align: center;">AutoTA</h1>
+    <h5 id="lives-text">You have 5 questions remaining!</h1>
+    <p style="margin-top: 5px; text-align: center;">AutoTA can make mistakes. Consider checking important information.</p>
+
     {% csrf_token %}
 
     <div class="container for chatbot">
         <div id="response" class="mt-4"></div>
 
         <div class="chat-footer">
-            <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
-            <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
-            <button id="modeButton" onclick="toggleMode()" class="btn btn-secondary mt-2">Toggle Mode ☀️\☽</button>
+            <input type="text" id="messageInput" class="form-control" placeholder="Type your message here" onkeydown="checkEnter(event)">
+            <button id="send" onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
         </div>
     </div>
 
     <div class="sidebar">
-        <a href="#" target="_blank">Link Text</a>
-        <a href="#" target="_blank">Link Text</a>
-        <a href="#" target="_blank">Link Text</a>
+        <a href="#">Relevant Resources would show up here!</a>
     </div>
 
     <script>
         let isDarkMode = false;
+
+        function checkEnter(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
         
         function toggleMode() {
             let element = document.body;
@@ -124,6 +132,25 @@
         async function sendMessage() {
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value;
+            messageInput.value = "";
+
+            // If message is longer than 150 characters, don't send it
+            const max_token_number = 10;
+            token_number = message.split(" ").length;
+            if((token_number < 2)){
+                alert("Please enter more context!");
+                return;
+            } else if (token_number > max_token_number) {
+                alert("Please enter a message shorter than " + max_token_number + " words!");
+                return;
+            }
+
+            if (isDivEmpty(document.getElementById('response'))){
+                followup = false;
+            } else {
+                followup = true;
+            }
+
             const requestOptions = {
                 method: 'POST',
                 headers: {
@@ -131,48 +158,77 @@
                     // Include CSRF token if necessary
                     'X-CSRFToken': csrf_token,
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({user_input: message, followup: followup}),
             };
+
+            displayMessage(message);
+
+            const sendButton = document.getElementById('send');
+            sendButton.disabled = true;
+            sendButton.innerText = "Thinking...";
 
             try {
                 const response = await fetch('', requestOptions);
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
-                messageInput.value = " ";
                 const backend_data_packet = await response.json();
 
                 lives = lives - 1;
                 updateLives();
 
                 const qa_div = document.getElementById('response');
-                displayMessage(backend_data_packet.message, backend_data_packet.response);
-                // qa_div.innerText = backend_data_packet.response;  // Display response message in the div
-
+                displayResponse(backend_data_packet.response);
+                updateLinks(backend_data_packet.refrences);
+                
             } catch (error) {
                 console.error('There has been a problem with your fetch operation:', error);
             }
         }
 
-        function displayMessage(message, response) {
+        function displayMessage(message) {
             const qa_div = document.getElementById('response');
 
             const messageDiv = document.createElement('div');
-            messageDiv.style = "background-color: #f5f5f5;"
+            messageDiv.style = "background-color: #f5f5f5; margin-right: 20%;"
             messageDiv.innerHTML = "<b>You: </b>" + "<br>" + message + "<br>";
             qa_div.appendChild(messageDiv);
+        
+            qa_div.scrollTop = qa_div.scrollHeight;
+        }
+
+        function displayResponse(response){
+            const qa_div = document.getElementById('response');
 
             const responseMessageDiv = document.createElement('div');
-            responseMessageDiv.style = "background-color: #f1f1f5;"
-            responseMessageDiv.innerHTML = "<b>AutoTA: </b>" + response + "<br>";
+            responseMessageDiv.style = "background-color: #f1f1f5; margin-right: 20%;"
+            responseMessageDiv.innerHTML = "<b>AutoTA: </b>"+ "<br>" + "<md-span>" + response + "</md-span>" + "<br>";
             qa_div.appendChild(responseMessageDiv);
 
             // Add a line break after every message
             const lineBreak = document.createElement('br');
             qa_div.appendChild(lineBreak);
-        
-            chatbox.scrollTop = chatbox.scrollHeight;
 
+            // Re-enable the send button
+            const sendButton = document.getElementById('send');
+            sendButton.disabled = false;
+            sendButton.innerText = "Send";
+        
+            qa_div.scrollTop = qa_div.scrollHeight;
+        }
+
+        function updateLinks(newLinks){
+            const sidebar = document.querySelector(".sidebar");
+            sidebar.innerHTML = "";
+            for (let i = 0; i < newLinks.length; i++) {
+                const link = newLinks[i];
+                const linkElement = document.createElement('a');
+                linkElement.href = "#"
+                formatted_text = link.split("/").slice(-2).join(" - ").slice(0, -3);
+                console.log(formatted_text);
+                linkElement.innerText = formatted_text;
+                sidebar.appendChild(linkElement);
+            }
         }
 
         function updateLives() {
@@ -180,10 +236,20 @@
 
             if(lives <= 0){
                 livesText.textContent = "You have exceeded the questions limit!";
+                // Disable the send button
+                const sendButton = document.getElementById('send');
+                sendButton.disabled = true;
+                sendButton.innerText = "No more questions!";
                 return;
             }
             livesText.textContent = "You have " + lives + " questions remaining!";
+
         }
+
+        function isDivEmpty(div) {
+            return !div.hasChildNodes();
+        }
+
     </script>
 </body>
 </html>
