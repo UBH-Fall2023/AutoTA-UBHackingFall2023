@@ -6,18 +6,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-    <!-- In your HTML, within the <head> or <body> tag -->
     <script type="text/javascript">
         var csrf_token = '{{ csrf_token }}';
     </script>
 
     <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 0px;
+            background-color: #f5f5f5;
+        }
         #response {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 550px;
+            height: 70%;
             overflow-y: scroll;
+            margin-bottom: 10px; /* Added margin for spacing */
+            margin-right: 100px; /* Added margin for spacing */
         }
         .dark-mode {
             background-color: #333333;
@@ -31,17 +39,30 @@
             margin-bottom: 10px;
         }
         .sidebar {
-            width: 175px;
+            width: 200px; /* Adjusted width */
             background-color: #f1f1f1;
-            position: absolute;
+            position: fixed;
             top: 150px;
-            right: 27px;
-            height: 200px;
+            right: 20px;
+            height: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px; /* Added border-radius for a rounded look */
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1); /* Added shadow for depth */
         }
         .sidebar a {
             display: block;
             padding: 10px;
             color: var(--link-color);
+            border-bottom: 1px solid #ccc;
+            text-decoration: none; /* Removed underline */
+            border-radius: 4px; /* Added border-radius for a rounded look */
+        }
+        .sidebar a:hover {
+            background-color: #e0e0e0; /* Added hover effect */
+        }
+        .sidebar a:last-child {
+            border-bottom: none;
         }
         .dark-mode .sidebar {
             background-color: #333333;
@@ -51,20 +72,28 @@
             background-color: white;
             color: black;
         }
-        #lives-text{
+        #lives-text {
             text-align: center;
+        }
+        .chat-footer {
+            position: fixed;
+            bottom: 20px;
+            width: 60%;
         }
     </style>
 </head>
 <body>
-    <h1 id="lives-text"></h1>
+    <h1 id="lives-text">You have 5 questions remaining!</h1>
     {% csrf_token %}
 
     <div class="container for chatbot">
-        <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
-        <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
         <div id="response" class="mt-4"></div>
-        <button id="modeButton" onclick="toggleMode()">Toggle Mode</button>
+
+        <div class="chat-footer">
+            <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
+            <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
+            <button id="modeButton" onclick="toggleMode()" class="btn btn-secondary mt-2">Toggle Mode ☀️\☽</button>
+        </div>
     </div>
 
     <div class="sidebar">
@@ -127,24 +156,31 @@
             const responseDiv = document.getElementById('response');
 
             const messageDiv = document.createElement('div');
+            messageDiv.style = "background-color: #f5f5f5;"
             messageDiv.innerText = 'You: ' + message;
             responseDiv.appendChild(messageDiv);
 
             const responseMessageDiv = document.createElement('div');
-            responseMessageDiv.innerText = 'Bot: ' + response;
+            responseMessageDiv.style = "background-color: #f1f1f5;"
+            responseMessageDiv.innerText = 'AutoTA: ' + response;
             responseDiv.appendChild(responseMessageDiv);
 
+            // Add a line break after every message
+            const lineBreak = document.createElement('br');
+            responseDiv.appendChild(lineBreak);
+        
             chatbox.scrollTop = chatbox.scrollHeight;
+
         }
 
         function updateLives() {
             const livesText = document.getElementById('lives-text');
 
             if(lives <= 0){
-                livesText.textContent = "You have exceeded the questions limit";
+                livesText.textContent = "You have exceeded the questions limit!";
                 return;
             }
-            livesText.textContent = "Number of questions remaining: " + lives;
+            livesText.textContent = "You have " + lives + " questions remaining!";
         }
     </script>
 </body>

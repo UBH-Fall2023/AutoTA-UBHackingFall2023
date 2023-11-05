@@ -11,8 +11,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
-
-
 @csrf_exempt
 def login_view(request):
     if(request.method == 'POST'):
@@ -29,7 +27,7 @@ def chatbot(request):
         data = json.loads(request.body.decode('utf-8'))
         message = data.get('message')
         response = "This is a test reponse. It should actually be from OPEN AI API"
-        return JsonResponse({'message': message, 'response': response})
+        return JsonResponse({'message': message, 'response': response, 'refrences': []})
 
     return render(request,"chatbox.html")
 
