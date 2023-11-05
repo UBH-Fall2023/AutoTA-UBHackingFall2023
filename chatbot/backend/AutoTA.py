@@ -141,15 +141,18 @@ class AutoTA():
 
         # Convert Markdown to HTML
         markdown_text = completion["choices"][0]["message"]["content"]
-        html = markdown.markdown(markdown_text)
+        markdown_text = markdown_text.replace("```C", "```")
+        markdown_text = markdown_text.replace("```c", "```")
         
-        return html, user_input, filepaths_of_relevent_docs, completion["usage"]["total_tokens"]
+        return markdown_text, user_input, filepaths_of_relevent_docs, completion["usage"]["total_tokens"]
 
     def follow_up(self, user_input: str):
         completion, filepaths_of_relevent_docs = self.get_chatgpt_responce(user_input=user_input)
 
         # Convert Markdown to HTML
         markdown_text = completion["choices"][0]["message"]["content"]
+        markdown_text = markdown_text.replace("```C", "```")
+        markdown_text = markdown_text.replace("```c", "```")
 
         return markdown_text, user_input, filepaths_of_relevent_docs, completion["usage"]["total_tokens"]
         
