@@ -187,7 +187,11 @@
 
         function isDivEmpty(id) {
             var div = document.getElementById(id);
-            return div.innerHTML.trim() === "";
+            if (div) {
+                return div.innerHTML.trim() === "";
+            } else {
+                return false; // or handle the case where the div doesn't exist
+            }
         }
 
     </script>
