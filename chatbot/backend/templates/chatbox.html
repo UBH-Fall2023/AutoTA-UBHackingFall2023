@@ -139,7 +139,6 @@
             const message = messageInput.value;
 
             // If message is longer than 150 characters, don't send it
-            const min_token_number = 5;
             const max_token_number = 150;
             token_number = message.split(" ").length;
             if((token_number < min_token_number)){
@@ -147,6 +146,9 @@
                 return;
             } else if (token_number > max_token_number) {
                 alert("Please enter a message shorter than " + max_token_number + " words!");
+                return;
+            } else if  (lives <= 0) {
+                alert("You ran out of lives! Come back later.")
                 return;
             }
 
