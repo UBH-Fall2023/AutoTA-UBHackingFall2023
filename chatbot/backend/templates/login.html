@@ -1,0 +1,60 @@
+
+<html>
+<head>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <style>
+        #login-form {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 200px;
+            overflow-y: scroll;
+            align-content: center;
+        }
+
+    </style>
+
+
+</head>
+
+    <div class="login">
+        {% csrf_token %}
+
+        <h1>Login in to AutoTa</h1>
+        <form id= 'login-form' method="post" action="{% url 'login_view' %}">
+          <p><input type="text" name="login" value="" placeholder="UBIT"></p>
+          <p><input type="password" name="password" value="" placeholder="Password"></p>
+          <p class="submit"><input type="submit" name="commit" value="Login"></p>
+        </form>
+      </div>
+
+    <script type="text/javascript">
+    var csrf_token = '{{ csrf_token }}';
+
+
+
+    const requestOptions = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrf_token,  // Ensure csrf_token has the correct value
+    },
+    body: JSON.stringify({ message: message })
+    };
+
+
+    try {
+
+    const response = await fetch('', requestOptions);
+
+    } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+    }
+
+    </script>
+
+</html>
