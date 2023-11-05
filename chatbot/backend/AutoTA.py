@@ -10,6 +10,7 @@ import openai
 import json
 import numpy as np
 from IPython.display import display, HTML
+import time
 
 
 class TextPreprocessor():
@@ -128,7 +129,16 @@ class AutoTA():
         messages.append({"role": "user", "content": final_user_content})
 
 
-        completion = openai.ChatCompletion.create(model="gpt-4", messages=messages)
+        completion = None
+        while not completion:
+            try:
+                print("Got to completion")
+                completion = openai.ChatCompletion.create(model="gpt-4", messages=messages)
+            except openai.error.RateLimitError as e:
+                retry_time = 15
+                print(f"Rate limit exceeded. Retrying in {retry_time} seconds...")
+                time.sleep(retry_time)
+                print("Got past sleep")
 
         self.previous_messages = messages[1:]
         self.previous_messages.append(dict(completion["choices"][0]["message"]))
