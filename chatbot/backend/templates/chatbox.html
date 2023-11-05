@@ -16,10 +16,22 @@
         <!-- In your HTML, within the <head> or <body> tag -->
 <script type="text/javascript">
     var csrf_token = '{{ csrf_token }}';
+
+
 </script>
+
+
 
     </head>
     <body>
+
+            <h1 id="lives-text">
+
+        </h1>
+
+
+
+
 
     {% csrf_token %}
         <!--
@@ -43,7 +55,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-        <style>
+    <style>
         #response {
             border: 1px solid #ccc;
             padding: 10px;
@@ -57,6 +69,8 @@
     </body>
 
     <script>
+        let lives = 5;
+
 
         async function sendMessage() {
         const messageInput = document.getElementById('messageInput');
@@ -72,11 +86,15 @@
   };
 
   try {
+
+
     const response = await fetch('', requestOptions);
     if (!response.ok) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
     const data = await response.json();
+    lives = lives - 1;
+    updateLives()
     const responseDiv = document.getElementById('response');
     displayMessage(message,data.response)
     responseDiv.innerText = data.response;  // Display response message in the div
@@ -99,6 +117,11 @@ function displayMessage(message, response) {
 
   chatbox.scrollTop = chatbox.scrollHeight;
 
+}
+
+function updateLives() {
+    const livesText = document.getElementById('lives-text');
+    livesText.textContent = "Number of questions remaining: " + lives;
 }
 
 
