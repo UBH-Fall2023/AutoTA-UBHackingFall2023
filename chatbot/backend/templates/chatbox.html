@@ -20,6 +20,8 @@
 
     </head>
     <body>
+
+    {% csrf_token %}
         <!--
         <div id="chat">
             <div id="chat-messages"></div>
@@ -28,9 +30,6 @@
               <button type="submit">Send</button>
             </form>
           </div>
-
-
-
 
     <div id="chatbox">
         <button type ="button"> Enter your prompt here</button>

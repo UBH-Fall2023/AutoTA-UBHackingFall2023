@@ -1,11 +1,39 @@
 
 <html>
     <div class="login">
+        {% csrf_token %}
+
         <h1>Login in to AutoTa</h1>
-        <form id="'login-form' method="post" action="">
+        <form id= 'login-form' method="post" action="{% url 'login_view' %}">
           <p><input type="text" name="login" value="" placeholder="UBIT"></p>
           <p><input type="password" name="password" value="" placeholder="Password"></p>
           <p class="submit"><input type="submit" name="commit" value="Login"></p>
         </form>
       </div>
+
+    <script type="text/javascript">
+    var csrf_token = '{{ csrf_token }}';
+
+
+
+    const requestOptions = {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrf_token,  // Ensure csrf_token has the correct value
+    },
+    body: JSON.stringify({ message: message })
+    };
+
+
+    try {
+
+    const response = await fetch('', requestOptions);
+
+    } catch (error) {
+    console.error('There has been a problem with your fetch operation:', error);
+    }
+
+    </script>
+
 </html>
