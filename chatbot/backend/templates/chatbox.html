@@ -40,20 +40,18 @@
         <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
         <div id="response" class="mt-4"></div>
         <h3 id="DarkModetext">Dark Mode is OFF</h3>
-        <button onclick="darkMode()">Darkmode</button>
-        <button onclick="lightMode()">LightMode</button>
+        <button id="modeButton" onclick="toggleMode()">Toggle Mode</button>
         <script>
-          function darkMode() {
-              let element = document.body;
-              let content = document.getElementById("DarkModetext");
-              element.className = "dark-mode";
-              content.innerText = "Dark Mode is ON";
-          }
-          function lightMode() {
-              let element = document.body;
-              let content = document.getElementById("DarkModetext");
-              element.className = "light-mode";
-              content.innerText = "Dark Mode is OFF";
+          let isDarkMode = false;
+ 
+          function toggleMode() {
+            let element = document.body;
+            let content = document.getElementById("DarkModetext");
+   
+            isDarkMode = !isDarkMode;
+   
+            element.className = isDarkMode ? "dark-mode" : "light-mode";
+            content.innerText = isDarkMode ? "Dark Mode is ON" : "Dark Mode is OFF";
           }
       </script>
     </div>
