@@ -1,0 +1,137 @@
+Programming Assignment 1: Conway's Game of Life CSE 220: Systems Programming
+Introduction
+In this project you will implement a simplified version of John Horton Conway’s Game of Life. The Game of Life is a particular model of cellular automaton, which is a method of modeling certain computations and interac- tions. Cellular automata theory is outside the scope of this class, but we can still explore this model.
+The Game of Life models an infinite grid of cells, in which every cell is either alive or dead. A simple and deterministic set of rules is used to step through generations of these cells by determining whether, from one generation to the next, a particular cell lives on, dies, or creates life. We will simplify this model by placing it on a finite grid, but otherwise following the rules of the Game of Life.
+Conway’s Game of Life is a well-studied model, as it exhibits some interesting properties. In fact, it has been proven that the Game of Life is computationally Turing complete, meaning that any computation that can be modeled by a digital computer can be performed by developing the correct starting position in the Game of Life and iterating until the desired result is computed as a pattern of cells.
+This assignment will give you practice dealing with C arrays and references to arrays, including multi- dimensional arrays. It will give you practice in separating repeated computations out into functions. It will introduce the concept of modifying a program’s data model to simplify computation.
+Like many real-world problems, this assignment will be mostly either entirely correct or entirely wrong. There will be a limited opportunity to get partial credit by following the instructions for output format closely even if your game is not capable of correct deterministic operation, but because errors in early generations will lead to rapid degeneration in later generations, correct operation is critical for significant credit.
+This document is long, but there is a reason for that. Please read it carefully and in its entirety before starting your assignment!
+You will have two weeks to complete this project.
+Academic Integrity
+As detailed in the course syllabus, academic integrity is important for the value and durability of your degree from the University at Buffalo. Here are a few reminders to help you maintain the integrity of this assignment.
+• It is a violation of the course academic integrity policy to share this assignment document or details about this assignment with any student at UB not enrolled in CSE 220 during this academic semester, with any student at any other institution, or with anyone else without permission from your instructor. This includes homework- and note-sharing Internet sites such as Course Hero and Chegg.
+• It is a violation of the course academic integrity policy to share any code from this assignment with any student at any time during or after this semester. You may discuss your code with course staff if necessary.
+• Itisaviolationofthecourseacademicintegritypolicytoseekassistancefromotherstudentsoranyonline resource not specifically approved by your instructor. Forbidden resources include: Stack Overflow/Stack Exchange, GitHub/GitLab/BitBucket, ChatGPT or other AI assistants, students who have previously taken this course, etc.
+• It is a violation of the course academic integrity policy to discuss implementation details with anyone except course staff.
+Students found violating any of these policies, or any other academic integrity policy in the syllabus, will be sanctioned. Sanctions may include failure in the course or expulsion from the University. Make sure that you are familiar with the course academic integrity policies, as well as the policies of the department and University.
+1
+
+In Memoriam
+John Conway passed away in April of 2020 of complications from COVID-19. The Game of Life, while possibly his most well known creation, is far from his only contribution to mathematics or computation.
+The following Life input is attributed to Randall Munroe, author of the XKCD web comic. Following the rules in this document, it transforms into a “glider” that departs the disintegrating body and flies off to the upper right. In our implementation, it becomes a “block” still life (you can find these terms defined in the resources linked later in this document), but in a complete implementation of Life it travels forever, upward and to the right, for an infinite distance. You can find it as the input file inputs/conway.life in the given code.
+Rest in peace, John Horton Conway, 1937–2020.
+1 Getting Started
+You should read this entire handout and all of the given code before you get started. You should have received a GitHub Classroom invitation for this project. Follow it and check out the resulting repository.
+It is probably best to read a good description of the Game of Life as your first step. I recommend the Wikipedia Article as a good starting point.
+Some other good resources include:
+• ConwayLife.com,acommunityforpeopleexploringtheGameofLifeanditsproperties
+• TheLifeWiki,whichcontainsanenormousamountofinterestingandhelpfulinformation
+2 Requirements
+You are required to implement the rules of Conway’s Game of Life, with the change that all cells not displayed in the required viewport are always considered dead.
+Your program must compute the rules of the Game of Life on a grid that is 80 cells wide by 24 cells high, assuming that all cells outside of this grid are dead. These constants are defined in the given file life.h as GRIDX anad GRIDY, respectively.
+The rules of Life are simple, and applied to every cell in the grid in the exact same fashion. Life proceeds in generations, where the state of the cells in generation G entirely determines the state of the cells in generation G + 1. The state of each cell in generation G + 1 is determined by the state of its eight neighboring cells in generation G; specifically, the number of those cells that are alive or dead. The neighbors of a cell are the cells immediately to its left, right, above, below, and on the four diagonals between those cells. The rules for a cell c are as follows:
+• Ifcisaliveandhasfewerthan2liveneighbors,itdies.
+• Ifcisaliveandhasmorethan3liveneighbors,itdies.
+• Ifcisaliveandhasexactly2or3liveneighbors,itremainsalive. • Ifcisdeadandhasexactly3liveneighbors,itbecomesalive.
+ 2
+
+The neighbors of the cell marked in the center of this grid are the cells marked in gray:
+Your implementation will use the character 'X' to represent a live cell, and the space character ' ' to rep- resent a dead cell. There are two constants defined in the given code, LIVE and DEAD, for this purpose.
+Your implementation must accept two command line arguments, a filename and a generation number. The filename is a file containing a starting state to be passed to the given function parse_life() (documented else- where in this handout), which will produce a grid with the initial state of the game, and the generation number is the generation which your program should output. Generation 0 is the starting state of the game as parsed by parse_life().
+Upon reaching the stated generation, your program must output the state of the grid, using exactly the format described here. Any difference in format, including extra or missing whitespace, will result in reduced credit on this assignment. The grid should be output as follows:
+• Every row of the GRIDY rows in the grid must be output as a single line of text ending in a newline.
+• EverycelloftheGRIDXcellsinarowofthegridmustbeoutputasasinglecharacter,eitheranASCIIspace
+for a dead cell or an ASCII X for a live cell.
+Your output will therefore be exactly 24 lines of exactly 80 characters each. Any deviation from this output is incorrect. In particular, extra whitespace at the beginnings or ends of lines, for example, will look like extra dead cells.
+Any invocation with fewer than one argument or more than two arguments should print an error message and exit (e.g., return from main()) with a non-zero exit status, with one exception: you may accept extra argu- ments beginning with a dash (-) character to enable different behaviors in your program for your own use in testing.
+3 Given Code
+You are given a significant quantity of code, but it all essentially boils down to three things: • Readingstartingpositionsfromfilesondisk
+• Clearingtheterminal • Constants
+There are extensive comments in the given code to help you understand what you have been given.
+You can find a parser for starting positions expressed in three common formats in src/parser.c. You do not need to read and understand this file, but you may find it helpful for your understanding of C and your development as a programmer to read through it. It solves real problems in practical ways. You do need to understand how to use the function parse_life(), which has a comment block describing its usage. Simply speaking, it takes a filename as an argument (such as would be passed to your program as argv[1]) and returns a 24 row by 80 column matrix of char cells that are either LIVE or DEAD, as appropriate.
+There is also a function, clearterm(), that clears the terminal screen. You can use this along with your output code and the function usleep() to produce animations for testing. (See Section 4.2 for more information.) This function takes no arguments and returns no value.
+Several constants are defined for you, as well. They are; • GRIDY: The number of rows in your grid of cells
+• GRIDX: The number of columns in your grid of cells • LIVE: The “live” cell character, 'X'
+ X
+3
+
+• DEAD: The “dead” cell character, ' '
+All of the given functions and constants are defined in the file src/life.h. This file is already included in src/main.c, where you should place your main function and begin your implementation.
+You should not need to change any of the given code, although you may do so if you like. I do not recommend this.
+You may create as many source files as you need in the source directory, but you must add their filenames to the SOURCEFILES variable in the Makefile or they will not be correctly submitted to Autograder.
+4 Testing
+Due to the nature of this program, debugging and testing can be tricky; in particular, errors from generation to generation can be difficult to isolate without voluminous output. I recommend several techniques for tackling testing and debugging in this assignment:
+Compute generational changes on paper or in an image editor. It can be difficult to determine whether a particular evolution is correct or not just by looking. In my implementation, I drew and computed a number of Life states by hand and compared them to my program’s output.
+In general, if you try to do this project without jotting down indices, calculations, portions of the grid, etc. on paper, you will probably waste a lot of time looking for trivial one-off errors, computations that are accidentally rotated in the matrix, and the like. Don’t be afraid to write things down!
+Output internal state to files or standard error — or just alongside the normal output. We have not talked much about output to anything but the normal terminal output, but there are two separate output streams to the terminal, standard output and standard error, that enable you to separate normal program output from errorsanddebugging.Youcanprinttostandarderrorusingfprintf(stderr, format, ...),whichtakesaformat string like printf() but outputs it slightly differently. We will cover the details another time, but in particular itwillallowyoutooutputdebugginginformationwithoutbreakingthechecksperformedbymake test.
+You can also open files using fopen() and write to them using functions like fprintf(). You need not dig into this now if you don’t want to, but it is discussed in Chapter 7 of K&R.
+You might, for example, want to output both the normal generational output and a neighbor count for every cell in a generation. I found this particular information very handy in debugging my implementation.
+Note that your final submitted project must not produce spurious output on either standard output or stan- dard error, or it will not receive full credit.
+Use a variety of test inputs. The given code has several example inputs in inputs/, as well as expected outputs thattheycanbecheckedagainstinoutputs/.Youcanperformsomeautomatedchecksusingmake test,butthere are inputs not tested in inputs/, and you may wish to fetch additional inputs from one of the Life web sites in Section 1, or even draw your own. You can easily draw states in the Life 1.05 format, which is described on the LifeWiki and an example of which is in inputs/tumbler.life.
+Testing your project thoroughly is key to receiving full credit on this project. In particular, make sure you test the life-and-death behavior of cells around the border of the grid, as the final Autograder will certainly test this.
+4.1 Useful Life Constructions
+There are two classes of test inputs which are likely to be particularly useful to you: still lifes and oscillators. A still life is a pattern that does not change at all from generation to generation. An example pattern, the block, can be found in inputs/block.life. It consists of four live cells in a rectangle configuration. An oscillator is a pattern that repeats itself on some fixed interval. One of the simplest possible oscillators, the blinker, is provided in inputs/blinker.rle. It repeats itself every other generation, forming a short vertical line in one generation and a short horizontal line in the next.
+4
+
+You will want to look at some of the patterns available on the LifeWiki, which has categories for both still lifes and oscillators. These patterns are valuable for testing because they have known, sometimes non-trivial, behaviors.
+4.2 Animation
+While you are not required to do so to receive full credit, I recommend that you implement an “animation mode” in your program. If it is started with only one argument, it should display generations on the terminal, one after another, with a brief pause between. You can accomplish this by drawing one generation, calling the usleep() function to sleep for 300-500 ms (usleep()’s argument is in microseconds, so use 300000 or 500000) after each generation, then calling the given function clearterm() before drawing another.
+In combination with hand-computing generations or comparing against known oscillators or still lifes found on the LifeWiki, this can help you isolate bugs in your generational computations. It’s also just plain fun to watch!
+4.3 Given Tests
+You have been given several input files along with pre-computed expected outputs. You can compare your program’s execution against these files using the command make test from the top-level source directory, or you can run your program and compare the outputs yourself. Careful examination of the recipe for make test should reveal how to write similar tests yourself. I will provide a working implementation of the life program that you can use to produce outputs against which you may compare your program’s behavior on inputs of your own choosing, as well.
+4.4 Achieving Full Credit
+If you test your solution with only the given tests, you will almost assuredly not receive full credit on this assignment.
+In particular, the given tests do minimal-to-no checking for the life-and-death status of cells around the border of the grid (see Section 5.6, below). In this and in all other assignments in this course, you are expected to create and run tests on your own. The links at the top of this document provide a rich source of test cases.
+5 Guidance
+The guidance in this section is intended to help you successfully complete this project correctly and in a timely manner. You are not required to use any particular data representation or any particular implementation tech- niques. However, the advice here is borne out of years of experience writing non-trivial programs.
+5.1 X- or Y-outer Dimensions
+Your matrices can be defined with their outer dimension being either the X or Y dimension. However, the parse_life() function returns a matrix with an outer Y dimension, and it is convenient to print matrices to the screen using an inner X dimension, so I recommend that you declare your state matrices to have an outer Y dimension and inner X dimension.
+5.2 Alternating Matrices
+Because each generation of the Game of Life is dependent only on the previous generation, it is convenient and efficient to perform all computations on two identical matrices. One matrix represents the current generation, and the other represents the next. After each generation, the roles of the two generations will swap.
+This can be conveniently accomplished by declaring a three-dimensional matrix, where the third dimension is 2, as follows:
+char grids[2][Y][X];
+5
+
+This represents two matrices with an outer Y dimension of X and an inner X dimension of Y. In generation 0, grids[0] would be used as the current generation, and the next generation computed on grids[1]. In generation 1, their roles would swap. The roles can be easily swapped using the modulus operator, %. For example:
+current = 0;
+for (int current = 0; ; current = (current + 1) % 2) { /* Do something */
+}
+Note that the calculation before the modulus operator must be parenthesized. The value of current will
+alternate between 0 and 1 in every iteration of this loop.
+5.3 Matrices with Borders
+Since your implementation is required to compute its visible field as if every cell outside of the field is dead, it may be convenient to place a border of dead cells around the GRIDY by GRIDX matrix and never recompute those cells to avoid having to deal with computing the cells around the border of your matrix with special cases. My implementation computes every cell using exactly the same function with no conditionals for cells at the edges of the matrix.
+Remember if you do this that your internal matrices will have to be of size GRIDY + 2 by GRIDX + 2, and that you will recompute the sub-matrix from [1][1] to [GRIDY][GRIDX] (assuming you use Y as our outer dimension).
+5.4 I/O
+As mentioned in Section 4, you can find documentation for the C standard I/O library in Chapter 7 of K&R. However, even if you do not read this chapter, there are some functions you may want to be aware of (and may want to read the man pages for):
+5.5
+• • •
+putchar(): This outputs a single character
+printf(): We’ve seen this before, but it’s very flexible in ways we have not yet explored
+fwrite():Youcanfwrite()totheFILE *namedstdouttowriteaspecifiednumberofbytestoyourprogram’s output
+Using Functions
+You will probably want to define several functions that operate on matrices. You can declare a function to take a two-dimensional matrix by defining an array argument with specified dimensions. Note, however, that you cannot pass the output of parse_life() in this fashion, as it does not return a true two-dimensional matrix (for reasons we will discuss later). A function accepting a matrix as an argument might be defined as:
+void use_matrix(char grid[Y][X]);
+Note that both the Y and X dimensions are specified in this definition. Remember that you must specify all dimensions except the outermost, and that you may specify even the outermost, when using multi-dimensional arrays in this fashion.
+Example functions that you should consider implementing are: • Afunctiontocomputethenumberofneighborsofagivencell
+• Afunctiontocomputethenextgeneration
+• Afunctiontooutputthestateofyourgridofcells
+In general, if a function is more than a couple of dozen lines long, you should consider whether it can be divided up. Sometimes it cannot, or it is not worth it, but often ways can be found to separate out bits of logic in a way that simplifies the overall implementation.
+6
+
+5.6 Likely Problem Areas
+The single most likely problem in your implementation is miscalculation around the edges of the matrix and in the corners. If you choose to use the border of dead cells described in Section 5.3, then this problem is greatly reduced. The next most likely concern is miscalculation of the number of neighbors due to counting the cell itself.
+6 Submission
+To create a submission tarball to be uploaded to Autograder, run the command make submission from your Git workspace. This will generate the file life.tar, which you should upload to Autograder.
+Remembertorunmake submissionbeforeeverysubmissiontoensurethatyouaresubmittingyourmostrecent code, and make sure that you are submitting the correct file. Many students have problems when they submit something from a previous project, and cannot figure out why their project won’t build!
+7 Grading
+This assignment is worth 5% of your course grade. Points for this project will be assigned as follows:
+Points Description
+2 Handout quiz (will not be represented on Autograder)
+2 life exits with an error message when invoked with invalid arguments
+4 life <inputfile> 0 correctly outputs the starting state (generation 0) for ar-
+bitrary input files
+4 life correctly computes the given blinker and pulsar oscillators through their
+entire periods
+8 life correctly computes automata over many generations
+This project will be worth 5% of your final course grade, including the handout quiz (which is 0.5% of your final course grade, or 10% of this assignment). The Autograder provided to you will not evaluate all 18 points for correctness, and you are responsible for testing your project thoroughly. It will be possible to receive full credit on the Autograder and substantially less than full credit in the gradebook.
+7

@@ -184,6 +184,12 @@
             }
             livesText.textContent = "You have " + lives + " questions remaining!";
         }
+
+        function isDivEmpty(id) {
+            var div = document.getElementById(id);
+            return div.innerHTML.trim() === "";
+        }
+
     </script>
 </body>
 </html>

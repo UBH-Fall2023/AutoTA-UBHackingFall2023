@@ -1,0 +1,109 @@
+Programming Assignment 0: Run-Length Decoder CSE 220: Systems Programming
+Introduction
+In this assignment, you will implement a run-length decoder program that accepts one run-length encoded string as an argument and prints its decoded result. Run-length encoding is a method of lossless data com- pression with many different implementations. You will be using a fairly basic and inefficient implementation that is described in this document.
+This will familiarize you with argument processing in C, the nature of C strings as arrays, character ma- nipulation, defining functions, and simple control flow.
+You will have one week to complete this project.
+Academic Integrity
+As detailed in the course syllabus, academic integrity is important for the value and durability of your degree from the University at Buffalo. Here are a few reminders to help you maintain the integrity of this assignment.
+• It is a violation of the course academic integrity policy to share this assignment document or details about this assignment with any student at UB not enrolled in CSE 220 during this academic semester, with any student at any other institution, or with anyone else without permission from your instructor. This includes homework- and note-sharing Internet sites such as Course Hero and Chegg.
+• It is a violation of the course academic integrity policy to share any code from this assignment with any student at any time during or after this semester. You may discuss your code with course staff if necessary.
+• Itisaviolationofthecourseacademicintegritypolicytoseekassistancefromotherstudentsoranyonline resource not specifically approved by your instructor. Forbidden resources include: Stack Overflow/Stack Exchange, GitHub/GitLab/BitBucket, ChatGPT or other AI assistants, students who have previously taken this course, etc.
+• It is a violation of the course academic integrity policy to discuss implementation details with anyone except course staff.
+Students found violating any of these policies, or any other academic integrity policy in the syllabus, will be sanctioned. Sanctions may include failure in the course or expulsion from the University. Make sure that you are familiar with the course academic integrity policies, as well as the policies of the department and University.
+1 Getting Started
+You should have received a GitHub Classroom invitation for this assignment. Follow it, then accept the invita- tion. This will create a GitHub repository that you can check out to complete this assignment. If you need help with this process, consult the Lab 01 instructions, which have more details.
+You should read this entire document and all of the given source code before you begin implementing this project. This document contains, in addition to the requirements that you must meet to receive full credit on this assignment, advice to help you implement it in an efficient and correct manner.
+2 Run-Length Encoding
+Run-length encoding (RLE) is a simple form of lossless data compression. It compresses runs of data into (hope- fully) smaller chunks without losing any information. You will encounter RLE files in PA1.
+1
+
+A run of data is a repetition of data, e.g. aaaaaaa. This run contains 7 a’s, so rather than store or transmit all seven, RLE compresses this string into just its count and value, 7a, which provides a nice saving in size. If the data being encoded has many long runs, this form of compression can be quite effective. However, if it has many short runs, it can increase the overall size of the data.
+# Some more examples of encoded strings.
+abbCCC => 1a2b3C
+# Non A-z characters are valid
+& ((( @ => 1&1 3(1 1@ eeeeeeeeeeeeeeezzz => 15e3z
+In some RLE implementations, single character runs are left as-is and not encoded. Q’s encoded complement is 1Q, which doubles the amount of space used. In this assignment, all encoded single characters will be preceded by 1. While inefficient, this makes your decoder slightly easier to implement!
+3 Requirements
+Your run-length decoder must be capable of parsing and decoding a run-length encoded string consisting of num- bers and arbitrary characters from its command line, decoding the string to its expanded string, and printing the decoded string. It will be invoked on the command line in just one way:
+# Decode the given run-length encoded string
+./rldecode 3a2b1c
+In this example, your decoder should output aaabbc
+The only valid invocation of your decoder is a single argument, which is a valid RLE string.
+Any other invocation (zero, two, or more arguments; arguments that are not valid RLE strings) is an error,
+and your program should print an error message and exit by returning a non-zero value from main(). Any correct invocation that produces a result should exit by returning a zero value from main().
+You must implement three functions for this assignment, only one of which is partially defined in the given code (but the other two have function prototypes):
+• int main(int argc, char *argv[]): This function is where all C programs start, and argc and argv are how you access the command line arguments. This function is partially defined in the given code.
+• bool isnumber(char c): This function accepts a single char as an argument and returns true if it is a valid number and false otherwise. This function is not defined in the given code, but its prototype appears at the top of the file.
+• int decode(char *str): This function accepts a run-length encoded string as an argument, prints the de- coded value of that string followed by an ASCII newline, and returns the integer length of the decoded string as a C integer. It must also handle malformed RLE strings, which are any string that does not ad- here to specific encoding method described in this document. When a malformed string is encountered, decode() should cease printing the decoded RLE string, print an error message, and return the integer value -1.
+Note that there is a C library function that could perform the role of isnumber() called isdigit(), and several C library functions that can parse the integers in the RLE string into C integers, including atoi() and strtol(). Any assignment using one of these functions will receive no credit. You must implement your isnumber() function by checking the character yourself, and parse integers from the RLE string yourself.
+3.1 Integers in RLE Strings
+An integer in our RLE encoding can range from 1 to 2147483647 (that is, 1 to 231 − 1), which matches the positive values of the 32-bit int type on our Linux x86-64 platform. You only need to be able to parse positive integers
+2
+
+greater than zero, and you do not need to check for or handle overflow (integers larger than 2147483647). The character - should not be treated specially.
+In the inputs tested against your program, an integer count will never precede an integer value. That is, you are not expected the handle the case where a run might be composed of integers, like 111111. With the RLE format described in this document, this would encode to 61 which distorts the rest of the encoded string. Integers will occur only as character counts in a correct encoding.
+4 Documentation
+The Unix system has on-line manual pages that are tremendously useful. All functions in the standard library, most commands, and many concepts are documented in these manual pages. The Unix manual pages on your UB CSE virtual machine image are an allowed resource for this assignment, and all other assignments in this course.
+Unix man pages can be viewed with the man command at the terminal prompt. The Unix manual is divided into sections, which is important to you because many C library functions also have commands of the same name, and command manual pages will display instead if the section is not specified! Unix commands are in section 1 of the manual, system calls are in section 2, and library functions are in section 3. We will discuss system calls and library functions later, but for now, remember that you may need to specify the section when looking for the documentation of a function. The man command is invoked as man [section] <pagename>, where the section number is an optional argument and the argument <pagename> represents the page you would like to view.
+Man page sections are noted as a number in square brackets after a keyword in this document. For example, putchar [3] indicates that the manual page for the putchar() function is found in section 3 of the Unix manual, andyoucanviewitwiththecommandman 3 putchar.
+5 Guidance
+How you approach this problem, and indeed how you approach any programming problem placed before you, will greatly affect its difficulty. The advice in this section is intended to arm you with the tools you need to solve this problem effectively. You need not follow this advice (this is guidance, not requirements!), but you should think hard about it before making a decision.
+5.1 Using Git Effectively
+In this assignment and all assignments for this course, you should commit early and often, pushing to GitHub after committing. This serves multiple purposes:
+• It protects your data. “My computer crashed” is never a valid excuse for losing assignment progress in this course. If your assignment is pushed to GitHub, you can simply check it out on another computer and keep working!
+• Course staff can view your progress and assist you more effectively. You must push your progress to GitHub before any course staff will look at your code. Pushing it regularly helps ensure that staff can quickly help you if you run into trouble.
+• Having commit history makes you free to keep your code clean and readable without losing previous approaches and implementation. If you delete or modify code that you later want back, you can simply restore it from your Git history. No more commenting out blocks of code that remain in place, distracting you from the task at hand and making your code difficult to understand!
+5.2 Testing
+The grader on Autolab will only return about 60–70% of your final project score during project submission. The remaining 30–40% will be tested only after the submission deadline has passed and all projects are turned in. You are responsible for testing your project as well as developing it!
+3
+
+Three simple tests are provided for you in the given code, and instructions for running them is in the file README.md. You should be implementing your own, additional tests and running them against your project. To decide what to test, look at what the given tests check and the requirements of your project, and implement tests for the difference. You may even find it helpful to write the tests before you write your implementation, so that make test can tell you how close you are to finished!
+5.3 Function Prototypes
+At the top of the file rldecode.c, you will see the following two lines of code (along with some documentation comments):
+bool isnumber(char c); int decode(char *str);
+These are function prototypes, and they declare that the functions isnumber() and decode() will be defined somewhere else, as well as their return types and the types of their arguments. In this case, isnumber() is de- clared to return a boolean, and accept a single character argument. Wherever such a function is defined later, it must match this prototype. Function prototypes are not unique to C, but they are not a feature of many modern languages with which you may be familiar. This is due to the way that C is designed and compiled.
+You will have to define these function elsewhere in your rldecode.c file. The definitions will look something like this:
+bool isnumber(char c) { /* Function logic */
+}
+5.4 Header Files
+Function prototypes are often found in header files, which are partial C source files that are intended to be included by other C source files at compilation time. In particular, many library functions are defined in header files, and the header file in which they are defined appears at the top of their man page. For example, the following code appears in the SYNOPSIS section of the man page for strlen [3]:
+#include <string.h>
+size_t strlen(const char *s);
+ThisindicatesthataCsourcefilethatwishestocallstrlen()shouldusethedirective#include <string.h>at the top of the file. (It also includes the function prototype for strlen() for quick reference.)
+5.5 C Strings
+A C String is an array of characters of type char, terminated by a zero byte (that is, an ASCII NUL character). This means that you can examine the individual characters of a C string by iterating the array until you reach a char with the value 0, idiomatically written as '\0'. For reasons that we will explain later, the type of a string is often expressed as char *. The idiomatic way to iterate a string in C is:
+char *str = "value";
+for (int i = 0; str[i] != '\0'; i++) {
+/* In each iteration of this loop, str[i] is the current character under consideration*/
+}
+The individual characters in a string can be compared to ASCII characters enclosed in single quotes. For example:
+if (isnumber(str[0])) { /* Integer char! */
+}
+4
+
+5.6 ASCII Characters
+Our modern Unix machines, such as the x86-64 Linux of the course virtual machine, mostly use a character encoding called UTF-8. A character encoding is the method of representing language characters as binary bit patterns. Un-accented Latin characters (such as used for the English language), numbers, and simple punctu- ation fall between the binary (integer) values of 0 and 127 in UTF-8, and map directly to an older character set called ASCII, the American Standard Code for Information Interchange. This includes the digits that you will have to parse for this project.
+A particular property of the ASCII character set is that the digits occur in order, from 0 to 9. The ASCII value of the character 0 is 48, the character 1 is 49, and so on. This means that the integer value of an ASCII digit can be calculated by subtracting the value '0' from the character in question. For example:
+char c = '7';
+int value = c - '0'; /* value = 7 */
+You may find the ascii [7] man page useful.
+5.7 Helpful Functions
+You may find some of these functions helpful in your implementation. You might not use all (or even any) of them in your implementation, and that is OK.
+• putchar [3]: This function accepts a C char as an argument and prints it to standard output.
+• strlen [3]: This function accepts a C string as an argument and returns the length of the string in bytes (which is equivalent to its length in ASCII characters)
+6 Submission
+To create a submission tarball to be uploaded to Autolab, run the command make submission from your Git workspace. This will generate the file rldecode.tar, which you should upload to Autolab.
+Remembertorunmake submissionbeforeeverysubmissiontoensurethatyouaresubmittingyourmostrecent code.
+7 Grading
+This assignment is worth 5% of your course grade. Points for this project will be assigned as follows:
+Points Description
+2 Handout quiz (will not be included in Autolab output)
+2 isnumber() correctly recognizes numbers, and only numbers
+3 decode() correctly returns the length of decoded RLE strings
+3 decode() correctly prints the decoded RLE string
+4 decode() returns -1 if given a malformed string as input
+6 rldecode correctly prints valid decoded strings and exits with a non-zero sta-
+tus on invalid inputs
+Remember that Autolab will only score 60–70% of the final project score during project submission. Full credit on Autolab before the deadline does not mean that you will receive full credit on your project! Be sure to test your project thoroughly.
+If you use any of the C library functions that parse an integer from a string, you will receive no credit for this assignment.
+5
