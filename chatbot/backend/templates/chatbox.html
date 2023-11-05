@@ -26,6 +26,11 @@
                isDarkMode = !isDarkMode;
                element.className = isDarkMode ? "dark-mode" : "light-mode";
                button.innerText = isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
+               updateSidebar();
+            }
+            function updateSidebar() {
+              let sidebar = document.querySelector(".sidebar");
+              sidebar.className = isDarkMode ? "sidebar dark-mode" : "sidebar light-mode";
             }
          </script>
       </div>
@@ -58,15 +63,25 @@
             background-color: #f1f1f1;
             position: absolute;
             top: 150;
-            right: 40;
+            right: 35;
             height: 200px;
          }
+
          .sidebar a {
-            display: block;
-            padding: 10px;
-            text-decoration: none;
-            color: #000;
-         }
+          display: block;
+          padding: 10px;
+          color: var(--link-color);
+        }
+      
+        .dark-mode .sidebar {
+          background-color: #333333;
+          color: #fff;
+        }
+
+        .light-mode .sidebar {
+          background-color: white;
+          color: black;
+        }
       </style>
    </body>
    <script>
