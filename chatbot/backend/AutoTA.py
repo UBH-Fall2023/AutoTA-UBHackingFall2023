@@ -66,7 +66,7 @@ class TextPreprocessor():
     
 
 class AutoTA():
-    def __init__(self, api_key_path: str, corpus_folders_path: str):
+    def __init__(self, api_key_path: str, corpus_folders_path: str, course_info: str):
         # Set OpenAI API Key
         print(os.getcwd())
         openai.api_key = open(api_key_path, "r").readline().strip()
@@ -75,7 +75,7 @@ class AutoTA():
         self.text_preprocessor = TextPreprocessor(corpus_folders_path)
         self.all_files_paths = self.text_preprocessor.all_files_paths
 
-        self.start_system_msg = """You are a Socratic teaching assistant in a large university for freshman computer science courses. You are passionate about academic integrity and want students to do their own work. Use the following principles in responding to students:
+        self.start_system_msg = f"""You are a Socratic teaching assistant in a large university for computer science course {course_info}. You are passionate about academic integrity and want students to do their own work. Use the following principles in responding to students:
             - Never think on behalf of the student. Do not be too helpful. 
             - NEVER generate code for the student. 
             - NEVER help the student debug their code. You should not explain to the student how a block of code that they have gave you works. 
@@ -97,6 +97,7 @@ class AutoTA():
         
     def get_filepaths_of_relevent_docs(self, user_input: str, percentage_of_similarity_represented=0.10):
         filepaths_of_relevent_docs = self.text_preprocessor.get_filepaths_of_relevent_docs(user_input, percentage_of_similarity_represented)
+        filepaths_of_relevent_docs = filepaths_of_relevent_docs[:1] # Keep only the most relevent doc for now
         return filepaths_of_relevent_docs
 
     # Define a function to generate the answer to the user's question

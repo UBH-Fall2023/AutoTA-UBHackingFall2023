@@ -17,7 +17,7 @@ def login_view(request):
 
     return render(request, 'login.html')
 
-myAutoTA = AutoTA(corpus_folders_path=r"./backend/secret_stuff/data", api_key_path=r"./backend/secret_stuff/OPENAI_API_KEY.txt")
+myAutoTA = AutoTA(corpus_folders_path=r"./backend/secret_stuff/data", api_key_path=r"./backend/secret_stuff/OPENAI_API_KEY.txt", course_info = "CSE 220: Systems Programming (C Language)")
 
 @csrf_exempt
 def chatbot(request):
