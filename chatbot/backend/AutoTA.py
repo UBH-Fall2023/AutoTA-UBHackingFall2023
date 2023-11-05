@@ -65,8 +65,9 @@ class TextPreprocessor():
     
 
 class AutoTA():
-    def __init__(self, api_key_path, corpus_folders_path: str='./openai-api-testing/data/'):
+    def __init__(self, api_key_path: str, corpus_folders_path: str):
         # Set OpenAI API Key
+        print(os.getcwd())
         openai.api_key = open(api_key_path, "r").readline().strip()
 
         # Load and preprocess text files
@@ -116,18 +117,16 @@ class AutoTA():
         final_user_content = ' '.join(final_user_content.split())
 
         # Add previous messages to system response if they exist
-        if len(self.previous_messages) != 0:
-            messages=[
+        messages=[
                 {"role": "system", "content": final_system_content},
-            ]
+        ]
+        
+        if len(self.previous_messages) != 0:
             for message in self.previous_messages:
                 messages.append(message)
-            messages.append({"role": "user", "content": final_user_content})
-        else:
-            messages=[
-                {"role": "system", "content": final_system_content},
-                {"role": "user", "content": final_user_content},
-            ]
+
+        messages.append({"role": "user", "content": final_user_content})
+
 
         completion = openai.ChatCompletion.create(model="gpt-4", messages=messages)
 
@@ -140,34 +139,21 @@ class AutoTA():
         self.previous_messages = []
         completion, filepaths_of_relevent_docs = self.get_chatgpt_responce(user_input=user_input)
 
-        print("User Input:", user_input)
-        print("Relevent Resources:", filepaths_of_relevent_docs)
-        print("Total Tokens Used:", completion["usage"]["total_tokens"])
-        print('\n'+ '-'*100 + '\n')
-
         # Convert Markdown to HTML
         markdown_text = completion["choices"][0]["message"]["content"]
         html = markdown.markdown(markdown_text)
-        # Display HTML
-        display(HTML(html))
-
-        print('\n'+ '-'*100 + '\n')
+        
+        return html, user_input, filepaths_of_relevent_docs, completion["usage"]["total_tokens"]
 
     def follow_up(self, user_input: str):
         completion, filepaths_of_relevent_docs = self.get_chatgpt_responce(user_input=user_input)
 
-        print("User Input:", user_input)
-        print("Relevent Resources:", filepaths_of_relevent_docs)
-        print("Total Tokens Used:", completion["usage"]["total_tokens"])
-        print('\n'+ '-'*100 + '\n')
-
         # Convert Markdown to HTML
         markdown_text = completion["choices"][0]["message"]["content"]
-        html = markdown.markdown(markdown_text)
-        # Display HTML
-        display(HTML(html))
+        html_text = markdown.markdown(markdown_text)
 
-        print('\n'+ '-'*100 + '\n')
+        return html_text, user_input, filepaths_of_relevent_docs, completion["usage"]["total_tokens"]
+        
 
 
 if __name__ == "__main__":
