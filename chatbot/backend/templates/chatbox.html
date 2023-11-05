@@ -20,33 +20,18 @@
 
 </script>
 
-
-
     </head>
     <body>
 
             <h1 id="lives-text">
 
+
+
         </h1>
 
-
-
-
-
     {% csrf_token %}
-        <!--
-        <div id="chat">
-            <div id="chat-messages"></div>
-            <form id="chat-form" method="post">
-              <input type="text" name="message" placeholder="Ask a question" maxlength="500">
-              <button type="submit">Send</button>
-            </form>
-          </div>
 
-    <div id="chatbox">
-        <button type ="button"> Enter your prompt here</button>
-    -->
-        <div class="container mt-5">
+        <div class="container for chatbot">
         <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
         <button onclick="sendMessage()">Send</button>
         <div id="response"></div>
@@ -64,6 +49,10 @@
         }
         #response div {
             margin-bottom: 10px;
+        }
+
+        #lives-text{
+            text-align: center;
         }
     </style>
     </body>
@@ -92,14 +81,23 @@
     if (!response.ok) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
+    messageInput.value = " ";
     const data = await response.json();
+
     lives = lives - 1;
-    updateLives()
+
+    updateLives();
+
     const responseDiv = document.getElementById('response');
-    displayMessage(message,data.response)
+
+    displayMessage(message,data.response);
+
     responseDiv.innerText = data.response;  // Display response message in the div
+      // epic.innerHTML = " ";
+
+
   } catch (error) {
-    console.error('There has been a problem with your fetch operation:', error);
+    console.error('There has been a problem with the fetch operation:', error);
   }
 }
 
@@ -112,7 +110,7 @@ function displayMessage(message, response) {
   responseDiv.appendChild(messageDiv);
 
   const responseMessageDiv = document.createElement('div');
-  responseMessageDiv.innerText = 'Bot: ' + response;
+  responseMessageDiv.innerText = 'AutoTA: ' + response;
   responseDiv.appendChild(responseMessageDiv);
 
   chatbox.scrollTop = chatbox.scrollHeight;
@@ -121,6 +119,11 @@ function displayMessage(message, response) {
 
 function updateLives() {
     const livesText = document.getElementById('lives-text');
+
+    if(lives <= 0){
+        livesText.textContent = "You have exceeded the questions limit"
+        return;
+    }
     livesText.textContent = "Number of questions remaining: " + lives;
 }
 
