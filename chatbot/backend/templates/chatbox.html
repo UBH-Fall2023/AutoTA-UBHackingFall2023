@@ -90,7 +90,7 @@
         <div id="response" class="mt-4"></div>
 
         <div class="chat-footer">
-            <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
+            <input type="text" id="messageInput" class="form-control" placeholder="Type your message here" onkeydown="checkEnter(event)">
             <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
             <button id="modeButton" onclick="toggleMode()" class="btn btn-secondary mt-2">Toggle Mode ☀️\☽</button>
         </div>
@@ -103,6 +103,13 @@
     </div>
 
     <script>
+
+        function checkEnter(event) {
+        if (event.keyCode === 13) {  // 13 is the keyCode for the ENTER key
+            event.preventDefault();  // Prevents the default action (form submission, page reload)
+            sendMessage();  // Calls your sendMessage function
+        }
+        }
         let isDarkMode = false;
         
         function toggleMode() {
@@ -161,6 +168,7 @@
             responseDiv.appendChild(messageDiv);
 
             const responseMessageDiv = document.createElement('div');
+            responseMessageDiv.value = response
             responseMessageDiv.style = "background-color: #f1f1f5;"
             responseMessageDiv.innerText = 'AutoTA: ' + response;
             responseDiv.appendChild(responseMessageDiv);
