@@ -1,137 +1,151 @@
-
 <html>
-    <head>
-        <title>AutoTA</title>
-
-
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-
-
-
-        <!-- In your HTML, within the <head> or <body> tag -->
-<script type="text/javascript">
-    var csrf_token = '{{ csrf_token }}';
-
-
-</script>
-
-    </head>
-    <body>
-
-            <h1 id="lives-text">
-
-
-
-        </h1>
-
-    {% csrf_token %}
-
-        <div class="container for chatbot">
-        <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
-        <button onclick="sendMessage()">Send</button>
-        <div id="response"></div>
-    </div>
-
-
+<head>
+    <title>AutoTA</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- In your HTML, within the <head> or <body> tag -->
+    <script type="text/javascript">
+        var csrf_token = '{{ csrf_token }}';
+    </script>
 
     <style>
         #response {
             border: 1px solid #ccc;
             padding: 10px;
-            height: 300px;
+            height: 550px;
             overflow-y: scroll;
+        }
+        .dark-mode {
+            background-color: #333333;
+            color: #fff;
+        }
+        .light-mode {
+            background-color: white;
+            color: black;
         }
         #response div {
             margin-bottom: 10px;
         }
-
+        .sidebar {
+            width: 175px;
+            background-color: #f1f1f1;
+            position: absolute;
+            top: 150px;
+            right: 27px;
+            height: 200px;
+        }
+        .sidebar a {
+            display: block;
+            padding: 10px;
+            color: var(--link-color);
+        }
+        .dark-mode .sidebar {
+            background-color: #333333;
+            color: #fff;
+        }
+        .light-mode .sidebar {
+            background-color: white;
+            color: black;
+        }
         #lives-text{
             text-align: center;
         }
     </style>
-    </body>
+</head>
+<body>
+    <h1 id="lives-text"></h1>
+    {% csrf_token %}
+
+    <div class="container for chatbot">
+        <input type="text" id="messageInput" class="form-control" placeholder="Type your message here">
+        <button onclick="sendMessage()" class="btn btn-primary mt-2">Send</button>
+        <div id="response" class="mt-4"></div>
+        <button id="modeButton" onclick="toggleMode()">Toggle Mode</button>
+    </div>
+
+    <div class="sidebar">
+        <a href="#" target="_blank">Link Text</a>
+        <a href="#" target="_blank">Link Text</a>
+        <a href="#" target="_blank">Link Text</a>
+    </div>
 
     <script>
+        let isDarkMode = false;
+        
+        function toggleMode() {
+            let element = document.body;
+            isDarkMode = !isDarkMode;
+            element.className = isDarkMode ? "dark-mode" : "light-mode";
+            button.innerText = isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode";
+            updateSidebar();
+        }
+
+        function updateSidebar() {
+            let sidebar = document.querySelector(".sidebar");
+            sidebar.className = isDarkMode ? "sidebar dark-mode" : "sidebar light-mode";
+        }
+
         let lives = 5;
 
-
         async function sendMessage() {
-        const messageInput = document.getElementById('messageInput');
-        const message = messageInput.value;
-        const requestOptions = {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        // Include CSRF token if necessary
-        'X-CSRFToken': csrf_token,
-        },
-        body: JSON.stringify({ message: message })
-  };
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            const requestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include CSRF token if necessary
+                    'X-CSRFToken': csrf_token,
+                },
+                body: JSON.stringify({ message: message })
+            };
 
-  try {
+            try {
+                const response = await fetch('', requestOptions);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                messageInput.value = " ";
+                const data = await response.json();
 
+                lives = lives - 1;
+                updateLives();
 
-    const response = await fetch('', requestOptions);
-    if (!response.ok) {
-      throw new Error('Network response was not ok ' + response.statusText);
-    }
-    messageInput.value = " ";
-    const data = await response.json();
+                const responseDiv = document.getElementById('response');
+                displayMessage(message, data.response);
+                responseDiv.innerText = data.response;  // Display response message in the div
+            } catch (error) {
+                console.error('There has been a problem with your fetch operation:', error);
+            }
+        }
 
-    lives = lives - 1;
+        function displayMessage(message, response) {
+            const responseDiv = document.getElementById('response');
 
-    updateLives();
+            const messageDiv = document.createElement('div');
+            messageDiv.innerText = 'You: ' + message;
+            responseDiv.appendChild(messageDiv);
 
-    const responseDiv = document.getElementById('response');
+            const responseMessageDiv = document.createElement('div');
+            responseMessageDiv.innerText = 'Bot: ' + response;
+            responseDiv.appendChild(responseMessageDiv);
 
-    displayMessage(message,data.response);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
 
-    responseDiv.innerText = data.response;  // Display response message in the div
-      // epic.innerHTML = " ";
+        function updateLives() {
+            const livesText = document.getElementById('lives-text');
 
-
-  } catch (error) {
-    console.error('There has been a problem with the fetch operation:', error);
-  }
-}
-
-
-function displayMessage(message, response) {
-  const responseDiv = document.getElementById('response');
-
-  const messageDiv = document.createElement('div');
-  messageDiv.innerText = 'You: ' + message;
-  responseDiv.appendChild(messageDiv);
-
-  const responseMessageDiv = document.createElement('div');
-  responseMessageDiv.innerText = 'AutoTA: ' + response;
-  responseDiv.appendChild(responseMessageDiv);
-
-  chatbox.scrollTop = chatbox.scrollHeight;
-
-}
-
-function updateLives() {
-    const livesText = document.getElementById('lives-text');
-
-    if(lives <= 0){
-        livesText.textContent = "You have exceeded the questions limit"
-        return;
-    }
-    livesText.textContent = "Number of questions remaining: " + lives;
-}
-
-
-
-
-
-
-
+            if(lives <= 0){
+                livesText.textContent = "You have exceeded the questions limit";
+                return;
+            }
+            livesText.textContent = "Number of questions remaining: " + lives;
+        }
     </script>
+</body>
 </html>
