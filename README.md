@@ -12,6 +12,7 @@ A chatbot that assists students with their queries in a manner consistent with a
 - [What We Learned](#what-we-learned)
 - [What's Next for AutoTA](#whats-next-for-autota)
 - [Built With](#built-with)
+- [AutoTA Team](#autota-team)
 
 ## Inspiration
 Inspired by the cutting-edge chatbots like Harvard's CS50 AI and Khan Academy's Khanmigo, AutoTA aims to enhance the academic experience by providing an interactive learning assistant.
@@ -39,3 +40,9 @@ This project was an invaluable opportunity to learn about teamwork in software d
 We aim to refine the chatbot's tuning to better reflect the approach of instructors who, with the goal of expanding its use across various introductory CSE courses.
 
 We have teamed up with several professors and  are currently plannng to do beta testing with students and instructors to gather feedback and improve the chatbot's performance over the winter semester.
+
+## AutoTA Team
+- [Eric Butcher](https://github.com/Eric-Butcher)
+- [Puru Soni](https://github.com/puru-soni-04)
+- [Sumanyu Janapareddy](https://github.com/sumanyuj)
+- [Ethan Canton](https://github.com/Ethanc9)
