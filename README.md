@@ -1,6 +1,8 @@
 # AutoTA Chatbot
 A chatbot that assists students with their queries in a manner consistent with academic integrity.
 
+![Screenshot](./Screenshot.png)
+
 ## Table of Contents
 - [Inspiration](#inspiration)
 - [What It Does](#what-it-does)
